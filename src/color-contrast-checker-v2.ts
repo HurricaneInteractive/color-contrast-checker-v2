@@ -1,12 +1,12 @@
-import { ColorContrastChecker } from './ccc'
+import { ColorContrastChecker, RBG } from './ccc'
 
 // Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
 // import "core-js/fn/array.find"
 // ...
 export default class CCC implements ColorContrastChecker {
-  r: string = ''
-  g: string = ''
-  b: string = ''
+  r!: number
+  g!: number
+  b!: number
   fontSize: number = 14
 
   regSixDigitColorcode: RegExp = new RegExp('^(#)?([0-9a-fA-F]{6})?$')
@@ -19,4 +19,9 @@ export default class CCC implements ColorContrastChecker {
 
   isValidColorCode = (hex: string): boolean =>
     this.isValidSixDigitColorCode(hex) || this.isValidThreeDigitColorCode(hex)
+
+  convertColorToSixDigit = (hex: string) =>
+    `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+
+  calculateLuminance = ({ r, g, b }: RBG): number => 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
