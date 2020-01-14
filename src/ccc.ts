@@ -20,6 +20,14 @@ enum WCAG {
   'FONT_CUTOFF' = 18
 }
 
+type Pairs = {
+  colorA: string
+  colorB: string
+  fontSize?: number
+}
+
+type CheckReturn = WCAGResultClass | CustomRadioResult | boolean
+
 interface ColorContrastChecker {
   r: number
   g: number
@@ -37,6 +45,11 @@ interface ColorContrastChecker {
   verifyContrastRatio(ratio: number): WCAGResultClass
   verifyCustomContrastRatio(inputRatio: number, checkRatio: number): CustomRadioResult
   hexToLuminance(color: string): number
+  check(colorA: string, colorB: string, fontSize: number, customRatio?: number): CheckReturn
+  isLevelAA(colorA: string, colorB: string, fontSize?: number): boolean
+  isLevelAAA(colorA: string, colorB: string, fontSize?: number): boolean
+  isLevelCustom(colorA: string, colorB: string, ratio: number): boolean
+  checkPairs(pairs: Array<Pairs>, customRatio?: number): Array<CheckReturn>
 }
 
 class RGBClass implements IRGBClass {
@@ -78,5 +91,7 @@ export {
   WCAGResultClass,
   CustomRadioResult,
   IRGBClass,
-  WCAG
+  WCAG,
+  Pairs,
+  CheckReturn
 }

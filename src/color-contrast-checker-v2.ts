@@ -4,7 +4,9 @@ import {
   RGBClass,
   WCAGResultClass,
   WCAG,
-  CustomRadioResult
+  CustomRadioResult,
+  Pairs,
+  CheckReturn
 } from './ccc'
 
 export default class CCC implements ColorContrastChecker {
@@ -112,5 +114,79 @@ export default class CCC implements ColorContrastChecker {
     let LRGB = this.calculateLRGB(RGBcolor)
 
     return this.calculateLuminance(LRGB.rgb)
+  }
+
+  check = (colorA: string, colorB: string, fontSize: number, customRatio: number|undefined = undefined): CheckReturn => {
+    this.fontSize = fontSize
+
+    if (!colorA || !colorB) {
+      return false
+    }
+
+    const l1 = this.hexToLuminance(colorA) /* higher value */
+    const l2 = this.hexToLuminance(colorB) /* lower value */
+    const contrastRatio = this.getContrastRatio(l1, l2)
+
+    if (typeof customRatio !== "undefined") {
+      // Method does not exist
+      // if (!this.isValidRatio(customRatio)) {
+      //   return false
+      // }
+      return this.verifyCustomContrastRatio(contrastRatio, customRatio)
+    } else {
+      return this.verifyContrastRatio(contrastRatio)
+    }
+  }
+
+  isLevelAA = (colorA: string, colorB: string, fontSize: number|undefined): boolean => {
+    const result = this.check(colorA, colorB, fontSize || this.fontSize)
+    if (typeof result === "boolean") {
+      return result
+    } else {
+      if (result instanceof WCAGResultClass) {
+        return result.AA
+      }
+    }
+
+    return false
+  }
+
+  isLevelAAA = (colorA: string, colorB: string, fontSize?: number): boolean => {
+    const result = this.check(colorA, colorB, fontSize || this.fontSize)
+    if (typeof result === "boolean") {
+      return result
+    } else {
+      if (result instanceof WCAGResultClass) {
+        return result.AA
+      }
+    }
+
+    return false
+  }
+
+  isLevelCustom = (colorA: string, colorB: string, ratio: number): boolean => {
+    const result = this.check(colorA, colorB, this.fontSize, ratio)
+    if (typeof result === "boolean") {
+      return result
+    }
+    else if (result instanceof CustomRadioResult) {
+      return result.customRatio
+    }
+
+    return false
+  }
+
+  checkPairs = (pairs: Array<Pairs>, customRatio: number|undefined): Array<CheckReturn> => {
+    let results: Array<CheckReturn> = []
+
+    pairs.map(({ colorA, colorB, fontSize }): CheckReturn => {
+      if (typeof fontSize !== "undefined") {
+        return this.check(colorA, colorB, fontSize || this.fontSize, customRatio || undefined)
+      } else {
+        return this.check(colorA, colorB, 0, customRatio)
+      }
+    })
+
+    return results
   }
 }
