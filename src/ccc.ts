@@ -1,4 +1,4 @@
-type RBG = {
+type RGB = {
   r: number
   g: number
   b: number
@@ -8,26 +8,46 @@ interface BaseRGBClass {
   toString(): string
 }
 
+interface IRGBClass extends BaseRGBClass {
+  rgb: RGB
+}
+
+enum WCAG {
+  'AA_LG' = 3.0,
+  'AA_SM' = 4.5,
+  'AAA_LG' = 4.5,
+  'AAA_SM' = 7.0,
+  'FONT_CUTOFF' = 18
+}
+
 interface ColorContrastChecker {
   r: number
   g: number
   b: number
   fontSize: number
-  rgbClass(): string
   isValidSixDigitColorCode(hex: string): boolean
   isValidThreeDigitColorCode(hex: string): boolean
   isValidColorCode(hex: string): boolean
   convertColorToSixDigit(hex: string): string
-  calculateLuminance(lRGB: RBG): number
+  calculateLuminance(lRGB: RGB): number
+  getRGBFromHex(color: string): RGBClass
+  calculateSRGB(rgb: RGBClass): RGBClass
+  calculateLRGB(rgb: RGBClass): RGBClass
+  getContrastRatio(lumA: number, lumB: number): number
+  verifyContrastRatio(ratio: number): WCAGResultClass
+  verifyCustomContrastRatio(inputRatio: number, checkRatio: number): CustomRadioResult
+  hexToLuminance(color: string): number
 }
 
-class RGBClass implements BaseRGBClass {
-  r: number = 0
-  g: number = 0
-  b: number = 0
+class RGBClass implements IRGBClass {
+  rgb = {
+    r: 0,
+    g: 0,
+    b: 0
+  }
 
   toString = (): string => {
-    return `<r: ${this.r} g: ${this.g} b: ${this.b} >`
+    return `<r: ${this.rgb.r} g: ${this.rgb.g} b: ${this.rgb.b} >`
   }
 }
 
@@ -50,4 +70,13 @@ class CustomRadioResult implements BaseRGBClass {
   }
 }
 
-export { ColorContrastChecker, RBG, BaseRGBClass, RGBClass, WCAGResultClass, CustomRadioResult }
+export {
+  ColorContrastChecker,
+  RGB,
+  BaseRGBClass,
+  RGBClass,
+  WCAGResultClass,
+  CustomRadioResult,
+  IRGBClass,
+  WCAG
+}
