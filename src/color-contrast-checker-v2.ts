@@ -99,7 +99,7 @@ export default class CCC implements ColorContrastChecker {
   }
 
   verifyCustomContrastRatio = (inputRatio: number, checkRatio: number): CustomRadioResult => {
-    var results = new CustomRadioResult()
+    const results = new CustomRadioResult()
 
     results.customRatio = inputRatio >= checkRatio
     return results
@@ -116,7 +116,12 @@ export default class CCC implements ColorContrastChecker {
     return this.calculateLuminance(LRGB.rgb)
   }
 
-  check = (colorA: string, colorB: string, fontSize: number, customRatio: number|undefined = undefined): CheckReturn => {
+  check = (
+    colorA: string,
+    colorB: string,
+    fontSize: number,
+    customRatio: number | undefined = undefined
+  ): CheckReturn => {
     this.fontSize = fontSize
 
     if (!colorA || !colorB) {
@@ -127,7 +132,7 @@ export default class CCC implements ColorContrastChecker {
     const l2 = this.hexToLuminance(colorB) /* lower value */
     const contrastRatio = this.getContrastRatio(l1, l2)
 
-    if (typeof customRatio !== "undefined") {
+    if (typeof customRatio !== 'undefined') {
       // Method does not exist
       // if (!this.isValidRatio(customRatio)) {
       //   return false
@@ -138,9 +143,9 @@ export default class CCC implements ColorContrastChecker {
     }
   }
 
-  isLevelAA = (colorA: string, colorB: string, fontSize: number|undefined): boolean => {
+  isLevelAA = (colorA: string, colorB: string, fontSize: number | undefined): boolean => {
     const result = this.check(colorA, colorB, fontSize || this.fontSize)
-    if (typeof result === "boolean") {
+    if (typeof result === 'boolean') {
       return result
     } else {
       if (result instanceof WCAGResultClass) {
@@ -153,7 +158,7 @@ export default class CCC implements ColorContrastChecker {
 
   isLevelAAA = (colorA: string, colorB: string, fontSize?: number): boolean => {
     const result = this.check(colorA, colorB, fontSize || this.fontSize)
-    if (typeof result === "boolean") {
+    if (typeof result === 'boolean') {
       return result
     } else {
       if (result instanceof WCAGResultClass) {
@@ -166,26 +171,27 @@ export default class CCC implements ColorContrastChecker {
 
   isLevelCustom = (colorA: string, colorB: string, ratio: number): boolean => {
     const result = this.check(colorA, colorB, this.fontSize, ratio)
-    if (typeof result === "boolean") {
+    if (typeof result === 'boolean') {
       return result
-    }
-    else if (result instanceof CustomRadioResult) {
+    } else if (result instanceof CustomRadioResult) {
       return result.customRatio
     }
 
     return false
   }
 
-  checkPairs = (pairs: Array<Pairs>, customRatio: number|undefined): Array<CheckReturn> => {
+  checkPairs = (pairs: Array<Pairs>, customRatio: number | undefined): Array<CheckReturn> => {
     let results: Array<CheckReturn> = []
 
-    pairs.map(({ colorA, colorB, fontSize }): CheckReturn => {
-      if (typeof fontSize !== "undefined") {
-        return this.check(colorA, colorB, fontSize || this.fontSize, customRatio || undefined)
-      } else {
-        return this.check(colorA, colorB, 0, customRatio)
+    pairs.map(
+      ({ colorA, colorB, fontSize }): CheckReturn => {
+        if (typeof fontSize !== 'undefined') {
+          return this.check(colorA, colorB, fontSize || this.fontSize, customRatio || undefined)
+        } else {
+          return this.check(colorA, colorB, 0, customRatio)
+        }
       }
-    })
+    )
 
     return results
   }
